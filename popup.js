@@ -711,10 +711,19 @@ function getDateStr() {
 function downloadFile(content, filename, type) {
   const blob = new Blob([content], { type: type + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
+  console.log('准备下载文件:', filename, '大小:', blob.size);
+  
   chrome.downloads.download({
     url: url,
     filename: filename,
     saveAs: true
+  }, (downloadId) => {
+    if (chrome.runtime.lastError) {
+      console.error('下载失败:', chrome.runtime.lastError.message);
+      alert('下载失败: ' + chrome.runtime.lastError.message);
+    } else {
+      console.log('下载已开始，ID:', downloadId);
+    }
   });
 }
 

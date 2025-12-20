@@ -121,9 +121,23 @@ function extractMessages() {
     let quote = '';
     if (quoteEl) {
       const quoteName = quoteEl.querySelector('[class*="user-nickname"]')?.textContent?.trim() || '';
-      const quoteText = quoteEl.querySelector('span:not([class])')?.textContent?.trim() || '';
+      // 尝试多种选择器获取引用文本
+      let quoteText = '';
+      // 方法1: 查找 reply-content 类
+      const replyContent = quoteEl.querySelector('[class*="reply-content"]');
+      if (replyContent) {
+        quoteText = replyContent.textContent?.trim() || '';
+      }
+      // 方法2: 获取整个引用容器的文本，排除用户名
+      if (!quoteText) {
+        const fullText = quoteEl.textContent?.trim() || '';
+        // 去掉用户名部分
+        quoteText = quoteName ? fullText.replace(quoteName, '').trim() : fullText;
+        // 去掉开头的冒号或分隔符
+        quoteText = quoteText.replace(/^[:\s：]+/, '').trim();
+      }
       if (quoteName || quoteText) {
-        quote = `${quoteName}: ${quoteText}`.substring(0, 50);
+        quote = `${quoteName}: ${quoteText}`;
       }
     }
     

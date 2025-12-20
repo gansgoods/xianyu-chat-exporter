@@ -130,6 +130,7 @@ function extractMessages() {
     let quote = '';
     let quoteImage = '';
     let quoteIsVideo = false;
+    let quoteVideoUrl = '';
     if (quoteEl) {
       const quoteName = quoteEl.querySelector('[class*="user-nickname"]')?.textContent?.trim() || '';
       
@@ -137,6 +138,8 @@ function extractMessages() {
       const quoteVideoEl = quoteEl.querySelector('video');
       if (quoteVideoEl) {
         quoteIsVideo = true;
+        quoteVideoUrl = quoteVideoEl.getAttribute('src') || '';
+        if (quoteVideoUrl.startsWith('//')) quoteVideoUrl = 'https:' + quoteVideoUrl;
       }
       
       // 检查引用是否包含图片
@@ -192,6 +195,24 @@ function extractMessages() {
       }
     }
     
+    // 如果引用包含视频，且当前消息的视频URL和引用视频URL相同，说明视频是引用的，不是消息本身的
+    // 保留 quoteVideoUrl 用于在引用框内显示视频
+    if (quoteIsVideo && quoteVideoUrl && videoUrl === quoteVideoUrl) {
+      videoUrl = '';
+    }
+    
+    // 如果引用包含图片，且当前消息的图片URL和引用图片URL相同（或类似），说明图片是引用的
+    if (quoteImage && imageUrl) {
+      // 提取图片ID进行比较（因为引用图片和原图可能URL略有不同）
+      const getImageId = (url) => {
+        const match = url.match(/O1CN[A-Za-z0-9]+/);
+        return match ? match[0] : url;
+      };
+      if (getImageId(imageUrl) === getImageId(quoteImage)) {
+        imageUrl = '';
+      }
+    }
+    
     // 获取时间戳（从前面的时间分隔符获取）
     let timestamp = '';
     let prevEl = el.closest('[style*="position: relative"]')?.previousElementSibling;
@@ -221,6 +242,8 @@ function extractMessages() {
         videoUrl,
         quote,
         quoteImage,
+        quoteIsVideo,
+        quoteVideoUrl,
         timestamp,
         avatar,
         selected: true
@@ -366,6 +389,20 @@ function generateQuoteHtml(msg) {
         <div class="quote-text">${escapeHtml(msg.quote)}</div>
         <img class="quote-img" src="${msg.quoteImage}" alt="引用图片">
       </div>`;
+  } else if (msg.quoteIsVideo && msg.quoteVideoUrl) {
+    // 引用包含视频 - 显示小视频播放器
+    quoteContent = `
+      <div class="quote">
+        <div class="quote-text">${escapeHtml(msg.quote)}</div>
+        <video class="quote-video" src="${msg.quoteVideoUrl}" controls preload="metadata"></video>
+      </div>`;
+  } else if (msg.quoteIsVideo) {
+    // 引用包含视频但没有URL（显示视频图标）
+    quoteContent = `
+      <div class="quote">
+        <div class="quote-text">${escapeHtml(msg.quote)}</div>
+        <div class="quote-video-icon">🎬</div>
+      </div>`;
   } else {
     // 纯文本引用
     quoteContent = `<div class="quote">${escapeHtml(msg.quote)}</div>`;
@@ -473,6 +510,18 @@ function generateHtml(msgs) {
       border-radius: 6px;
       display: block;
       cursor: pointer;
+    }
+    .quote-video {
+      max-width: 120px;
+      max-height: 160px;
+      border-radius: 6px;
+      display: block;
+      margin-top: 6px;
+    }
+    .quote-video-icon {
+      font-size: 24px;
+      opacity: 0.7;
+      margin-top: 4px;
     }
     .text { font-size: 14px; word-break: break-word; }
     .chat-img { 

@@ -193,6 +193,19 @@ document.getElementById('exportHtml').addEventListener('click', () => {
   
   const html = generateHtml(selected);
   downloadFile(html, `聊天记录_${chatTitle}_${getDateStr()}.html`, 'text/html');
+  
+  // 调试模式：同时导出 JSON 原始数据
+  if (document.getElementById('debugMode').checked) {
+    const debugData = {
+      exportTime: new Date().toISOString(),
+      chatTitle: chatTitle,
+      totalMessages: messages.length,
+      selectedMessages: selected.length,
+      messages: selected
+    };
+    const json = JSON.stringify(debugData, null, 2);
+    downloadFile(json, `调试数据_${chatTitle}_${getDateStr()}.json`, 'application/json');
+  }
 });
 
 // 导出 Markdown
@@ -205,6 +218,19 @@ document.getElementById('exportMd').addEventListener('click', () => {
   
   const md = generateMarkdown(selected);
   downloadFile(md, `聊天记录_${chatTitle}_${getDateStr()}.md`, 'text/markdown');
+  
+  // 调试模式：同时导出 JSON 原始数据
+  if (document.getElementById('debugMode').checked) {
+    const debugData = {
+      exportTime: new Date().toISOString(),
+      chatTitle: chatTitle,
+      totalMessages: messages.length,
+      selectedMessages: selected.length,
+      messages: selected
+    };
+    const json = JSON.stringify(debugData, null, 2);
+    downloadFile(json, `调试数据_${chatTitle}_${getDateStr()}.json`, 'application/json');
+  }
 });
 
 // 生成 HTML

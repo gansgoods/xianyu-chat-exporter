@@ -303,10 +303,14 @@ function generateHtml(msgs) {
       max-height: 300px;
       border-radius: 8px; 
       display: block;
+      cursor: pointer;
+      transition: opacity 0.2s;
     }
+    .chat-img:hover { opacity: 0.85; }
     .chat-video { 
       max-width: 200px; 
-      border-radius: 8px; 
+      border-radius: 8px;
+      cursor: pointer;
     }
     .time { 
       font-size: 11px; 
@@ -315,6 +319,46 @@ function generateHtml(msgs) {
       text-align: right;
     }
     .msg.me .time { color: rgba(0,0,0,0.5); }
+    
+    /* Lightbox 遮罩层样式 */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      cursor: zoom-out;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox-content {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      color: #fff;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+      z-index: 10000;
+    }
+    .lightbox-close:hover { opacity: 1; }
+    .lightbox video {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
@@ -325,6 +369,57 @@ function generateHtml(msgs) {
       ${messagesHtml}
     </div>
   </div>
+  
+  <!-- Lightbox 遮罩层 -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <div id="lightbox-body"></div>
+  </div>
+  
+  <script>
+    // 点击图片打开 Lightbox
+    document.querySelectorAll('.chat-img').forEach(img => {
+      img.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const lightbox = document.getElementById('lightbox');
+        const body = document.getElementById('lightbox-body');
+        body.innerHTML = '<img class="lightbox-content" src="' + this.src + '" alt="大图" onclick="event.stopPropagation()">';
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    
+    // 点击视频打开 Lightbox
+    document.querySelectorAll('.chat-video').forEach(video => {
+      video.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        this.pause();
+        const lightbox = document.getElementById('lightbox');
+        const body = document.getElementById('lightbox-body');
+        body.innerHTML = '<video class="lightbox-content" src="' + this.src + '" controls autoplay onclick="event.stopPropagation()"></video>';
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    
+    // 关闭 Lightbox
+    function closeLightbox() {
+      const lightbox = document.getElementById('lightbox');
+      const body = document.getElementById('lightbox-body');
+      // 停止视频播放
+      const video = body.querySelector('video');
+      if (video) video.pause();
+      body.innerHTML = '';
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    // ESC 键关闭
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+  </script>
 </body>
 </html>`;
 }

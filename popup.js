@@ -336,8 +336,10 @@ function generateHtml(msgs) {
     }
     .lightbox.active { display: flex; }
     .lightbox-content {
-      max-width: 90%;
-      max-height: 90%;
+      max-width: 90vw;
+      max-height: 90vh;
+      width: auto;
+      height: auto;
       object-fit: contain;
       border-radius: 8px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
@@ -355,8 +357,10 @@ function generateHtml(msgs) {
     }
     .lightbox-close:hover { opacity: 1; }
     .lightbox video {
-      max-width: 90%;
-      max-height: 90%;
+      max-width: 90vw;
+      max-height: 90vh;
+      width: auto;
+      height: auto;
       border-radius: 8px;
     }
   </style>

@@ -251,51 +251,64 @@ document.getElementById('selectAll').addEventListener('change', (e) => {
 
 // 导出 HTML
 document.getElementById('exportHtml').addEventListener('click', () => {
-  const selected = messages.filter(m => m.selected);
-  if (selected.length === 0) {
-    alert('请至少选择一条消息');
-    return;
-  }
-  
-  const html = generateHtml(selected);
-  downloadFile(html, `聊天记录_${chatTitle}_${getDateStr()}.html`, 'text/html');
-  
-  // 调试模式：同时导出 JSON 原始数据
-  if (document.getElementById('debugMode').checked) {
-    const debugData = {
-      exportTime: new Date().toISOString(),
-      chatTitle: chatTitle,
-      totalMessages: messages.length,
-      selectedMessages: selected.length,
-      messages: selected
-    };
-    const json = JSON.stringify(debugData, null, 2);
-    downloadFile(json, `调试数据_${chatTitle}_${getDateStr()}.json`, 'application/json');
+  try {
+    const selected = messages.filter(m => m.selected);
+    if (selected.length === 0) {
+      alert('请至少选择一条消息');
+      return;
+    }
+    
+    console.log('开始导出 HTML，选中消息数:', selected.length);
+    const html = generateHtml(selected);
+    console.log('HTML 生成成功，长度:', html.length);
+    downloadFile(html, `聊天记录_${chatTitle}_${getDateStr()}.html`, 'text/html');
+    
+    // 调试模式：同时导出 JSON 原始数据
+    if (document.getElementById('debugMode').checked) {
+      const debugData = {
+        exportTime: new Date().toISOString(),
+        chatTitle: chatTitle,
+        totalMessages: messages.length,
+        selectedMessages: selected.length,
+        messages: selected
+      };
+      const json = JSON.stringify(debugData, null, 2);
+      downloadFile(json, `调试数据_${chatTitle}_${getDateStr()}.json`, 'application/json');
+    }
+  } catch (error) {
+    console.error('导出 HTML 失败:', error);
+    alert('导出失败: ' + error.message);
   }
 });
 
 // 导出 Markdown
 document.getElementById('exportMd').addEventListener('click', () => {
-  const selected = messages.filter(m => m.selected);
-  if (selected.length === 0) {
-    alert('请至少选择一条消息');
-    return;
-  }
-  
-  const md = generateMarkdown(selected);
-  downloadFile(md, `聊天记录_${chatTitle}_${getDateStr()}.md`, 'text/markdown');
-  
-  // 调试模式：同时导出 JSON 原始数据
-  if (document.getElementById('debugMode').checked) {
-    const debugData = {
-      exportTime: new Date().toISOString(),
-      chatTitle: chatTitle,
-      totalMessages: messages.length,
-      selectedMessages: selected.length,
-      messages: selected
+  try {
+    const selected = messages.filter(m => m.selected);
+    if (selected.length === 0) {
+      alert('请至少选择一条消息');
+      return;
+    }
+    
+    console.log('开始导出 Markdown，选中消息数:', selected.length);
+    const md = generateMarkdown(selected);
+    downloadFile(md, `聊天记录_${chatTitle}_${getDateStr()}.md`, 'text/markdown');
+    
+    // 调试模式：同时导出 JSON 原始数据
+    if (document.getElementById('debugMode').checked) {
+      const debugData = {
+        exportTime: new Date().toISOString(),
+        chatTitle: chatTitle,
+        totalMessages: messages.length,
+        selectedMessages: selected.length,
+        messages: selected
     };
     const json = JSON.stringify(debugData, null, 2);
     downloadFile(json, `调试数据_${chatTitle}_${getDateStr()}.json`, 'application/json');
+  }
+  } catch (error) {
+    console.error('导出 Markdown 失败:', error);
+    alert('导出失败: ' + error.message);
   }
 });
 

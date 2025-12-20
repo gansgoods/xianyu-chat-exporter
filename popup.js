@@ -239,18 +239,20 @@ function updateSelectAll() {
   document.getElementById('selectAll').checked = allSelected;
 }
 
-// 全选切换
-document.getElementById('selectAll').addEventListener('change', (e) => {
-  const checked = e.target.checked;
-  messages.forEach(m => m.selected = checked);
-  document.querySelectorAll('.message-item input[type="checkbox"]').forEach(cb => {
-    cb.checked = checked;
+// 绑定事件（在 DOMContentLoaded 后自动执行，因为 script 在 body 底部）
+function bindEvents() {
+  // 全选切换
+  document.getElementById('selectAll')?.addEventListener('change', (e) => {
+    const checked = e.target.checked;
+    messages.forEach(m => m.selected = checked);
+    document.querySelectorAll('.message-item input[type="checkbox"]').forEach(cb => {
+      cb.checked = checked;
+    });
+    updateStatus();
   });
-  updateStatus();
-});
 
-// 导出 HTML
-document.getElementById('exportHtml').addEventListener('click', () => {
+  // 导出 HTML
+  document.getElementById('exportHtml')?.addEventListener('click', () => {
   try {
     const selected = messages.filter(m => m.selected);
     if (selected.length === 0) {
@@ -279,38 +281,44 @@ document.getElementById('exportHtml').addEventListener('click', () => {
     console.error('导出 HTML 失败:', error);
     alert('导出失败: ' + error.message);
   }
-});
+  });
 
-// 导出 Markdown
-document.getElementById('exportMd').addEventListener('click', () => {
-  try {
-    const selected = messages.filter(m => m.selected);
-    if (selected.length === 0) {
-      alert('请至少选择一条消息');
-      return;
+  // 导出 Markdown
+  document.getElementById('exportMd')?.addEventListener('click', () => {
+    try {
+      const selected = messages.filter(m => m.selected);
+      if (selected.length === 0) {
+        alert('请至少选择一条消息');
+        return;
+      }
+      
+      console.log('开始导出 Markdown，选中消息数:', selected.length);
+      const md = generateMarkdown(selected);
+      downloadFile(md, `聊天记录_${chatTitle}_${getDateStr()}.md`, 'text/markdown');
+      
+      // 调试模式：同时导出 JSON 原始数据
+      if (document.getElementById('debugMode').checked) {
+        const debugData = {
+          exportTime: new Date().toISOString(),
+          chatTitle: chatTitle,
+          totalMessages: messages.length,
+          selectedMessages: selected.length,
+          messages: selected
+        };
+        const json = JSON.stringify(debugData, null, 2);
+        downloadFile(json, `调试数据_${chatTitle}_${getDateStr()}.json`, 'application/json');
+      }
+    } catch (error) {
+      console.error('导出 Markdown 失败:', error);
+      alert('导出失败: ' + error.message);
     }
-    
-    console.log('开始导出 Markdown，选中消息数:', selected.length);
-    const md = generateMarkdown(selected);
-    downloadFile(md, `聊天记录_${chatTitle}_${getDateStr()}.md`, 'text/markdown');
-    
-    // 调试模式：同时导出 JSON 原始数据
-    if (document.getElementById('debugMode').checked) {
-      const debugData = {
-        exportTime: new Date().toISOString(),
-        chatTitle: chatTitle,
-        totalMessages: messages.length,
-        selectedMessages: selected.length,
-        messages: selected
-    };
-    const json = JSON.stringify(debugData, null, 2);
-    downloadFile(json, `调试数据_${chatTitle}_${getDateStr()}.json`, 'application/json');
-  }
-  } catch (error) {
-    console.error('导出 Markdown 失败:', error);
-    alert('导出失败: ' + error.message);
-  }
-});
+  });
+  
+  console.log('事件绑定完成');
+}
+
+// 立即绑定事件
+bindEvents();
 
 // 生成引用 HTML
 function generateQuoteHtml(msg) {

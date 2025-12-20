@@ -356,6 +356,42 @@ function generateHtml(msgs) {
       z-index: 10000;
     }
     .lightbox-close:hover { opacity: 1; }
+    .lightbox-controls {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 10000;
+    }
+    .lightbox-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      backdrop-filter: blur(4px);
+    }
+    .lightbox-btn:hover { background: rgba(255, 255, 255, 0.3); }
+    .lightbox-btn:active { transform: scale(0.95); }
+    .zoom-info {
+      color: #fff;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 22px;
+      backdrop-filter: blur(4px);
+    }
     .lightbox video {
       max-width: 90vw;
       max-height: 90vh;
@@ -378,16 +414,60 @@ function generateHtml(msgs) {
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
     <div id="lightbox-body"></div>
+    <div class="lightbox-controls" onclick="event.stopPropagation()">
+      <button class="lightbox-btn" onclick="zoomOut()" title="缩小">−</button>
+      <span class="zoom-info" id="zoom-info">100%</span>
+      <button class="lightbox-btn" onclick="zoomIn()" title="放大">+</button>
+      <button class="lightbox-btn" onclick="zoomReset()" title="重置">↺</button>
+    </div>
   </div>
   
   <script>
+    let currentZoom = 100;
+    const ZOOM_STEP = 25;
+    const ZOOM_MIN = 25;
+    const ZOOM_MAX = 300;
+    
+    // 更新缩放显示
+    function updateZoom() {
+      const content = document.querySelector('#lightbox-body .lightbox-content');
+      if (content) {
+        content.style.transform = 'scale(' + (currentZoom / 100) + ')';
+      }
+      document.getElementById('zoom-info').textContent = currentZoom + '%';
+    }
+    
+    // 放大
+    function zoomIn() {
+      if (currentZoom < ZOOM_MAX) {
+        currentZoom += ZOOM_STEP;
+        updateZoom();
+      }
+    }
+    
+    // 缩小
+    function zoomOut() {
+      if (currentZoom > ZOOM_MIN) {
+        currentZoom -= ZOOM_STEP;
+        updateZoom();
+      }
+    }
+    
+    // 重置
+    function zoomReset() {
+      currentZoom = 100;
+      updateZoom();
+    }
+    
     // 点击图片打开 Lightbox
     document.querySelectorAll('.chat-img').forEach(img => {
       img.addEventListener('click', function(e) {
         e.stopPropagation();
+        currentZoom = 100;
         const lightbox = document.getElementById('lightbox');
         const body = document.getElementById('lightbox-body');
         body.innerHTML = '<img class="lightbox-content" src="' + this.src + '" alt="大图" onclick="event.stopPropagation()">';
+        document.getElementById('zoom-info').textContent = '100%';
         lightbox.classList.add('active');
         document.body.style.overflow = 'hidden';
       });
@@ -399,9 +479,11 @@ function generateHtml(msgs) {
         e.stopPropagation();
         e.preventDefault();
         this.pause();
+        currentZoom = 100;
         const lightbox = document.getElementById('lightbox');
         const body = document.getElementById('lightbox-body');
         body.innerHTML = '<video class="lightbox-content" src="' + this.src + '" controls autoplay onclick="event.stopPropagation()"></video>';
+        document.getElementById('zoom-info').textContent = '100%';
         lightbox.classList.add('active');
         document.body.style.overflow = 'hidden';
       });
@@ -417,12 +499,24 @@ function generateHtml(msgs) {
       body.innerHTML = '';
       lightbox.classList.remove('active');
       document.body.style.overflow = '';
+      currentZoom = 100;
     }
     
-    // ESC 键关闭
+    // 键盘快捷键
     document.addEventListener('keydown', function(e) {
+      if (!document.getElementById('lightbox').classList.contains('active')) return;
       if (e.key === 'Escape') closeLightbox();
+      if (e.key === '+' || e.key === '=') zoomIn();
+      if (e.key === '-') zoomOut();
+      if (e.key === '0') zoomReset();
     });
+    
+    // 鼠标滚轮缩放
+    document.getElementById('lightbox').addEventListener('wheel', function(e) {
+      e.preventDefault();
+      if (e.deltaY < 0) zoomIn();
+      else zoomOut();
+    }, { passive: false });
   </script>
 </body>
 </html>`;

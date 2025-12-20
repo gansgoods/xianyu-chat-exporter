@@ -47,8 +47,17 @@ function extractMessages() {
     || document.querySelector('[class*="user-name"]')?.textContent?.trim()
     || '聊天记录';
 
-  // 获取所有消息元素
-  const messageElements = document.querySelectorAll('[class*="ant-list-item"]');
+  // 获取所有消息元素（排除商品卡片等非聊天消息）
+  const allElements = document.querySelectorAll('[class*="ant-list-item"]');
+  const messageElements = Array.from(allElements).filter(el => {
+    // 排除商品卡片（通常包含价格信息）
+    if (el.querySelector('[class*="price"]')) return false;
+    // 排除没有消息文本和媒体的元素
+    const hasText = el.querySelector('[class*="message-text"]');
+    const hasImage = el.querySelector('[class*="image-container"]');
+    const hasVideo = el.querySelector('video');
+    return hasText || hasImage || hasVideo;
+  });
   
   // 判断是否是有效头像（排除占位图）
   function isValidAvatar(url) {
@@ -342,12 +351,12 @@ function generateQuoteHtml(msg) {
     // 引用包含图片
     quoteContent = `
       <div class="quote">
-        <div class="quote-text">↩️ ${escapeHtml(msg.quote)}</div>
+        <div class="quote-text">${escapeHtml(msg.quote)}</div>
         <img class="quote-img" src="${msg.quoteImage}" alt="引用图片">
       </div>`;
   } else {
     // 纯文本引用
-    quoteContent = `<div class="quote">↩️ ${escapeHtml(msg.quote)}</div>`;
+    quoteContent = `<div class="quote">${escapeHtml(msg.quote)}</div>`;
   }
   return quoteContent;
 }
@@ -382,7 +391,8 @@ function generateHtml(msgs) {
       line-height: 1.5;
     }
     .container { 
-      max-width: 600px; 
+      max-width: 900px; 
+      width: 80%;
       margin: 0 auto;
       background: #fff;
       border-radius: 12px;

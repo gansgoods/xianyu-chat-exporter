@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "闲鱼聊天记录导出",
+  "version": "1.0.0",
+  "description": "一键导出闲鱼聊天记录为HTML文件，支持勾选消息",
+  "permissions": ["activeTab", "scripting", "downloads"],
+  "host_permissions": ["*://*.xianyu.com/*", "*://*.goofish.com/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.svg",
+      "48": "icon48.svg",
+      "128": "icon128.svg"
+    }
+  },
+  "icons": {
+    "16": "icon16.svg",
+    "48": "icon48.svg",
+    "128": "icon128.svg"
+  }
+}

@@ -119,23 +119,31 @@ function extractMessages() {
     // 检查是否有引用
     const quoteEl = el.querySelector('[class*="reply-container"]');
     let quote = '';
+    let quoteImage = '';
     if (quoteEl) {
       const quoteName = quoteEl.querySelector('[class*="user-nickname"]')?.textContent?.trim() || '';
-      // 尝试多种选择器获取引用文本
+      
+      // 检查引用是否包含图片
+      const quoteImgEl = quoteEl.querySelector('[class*="reply-image"] img:first-child');
+      if (quoteImgEl) {
+        let imgSrc = quoteImgEl.getAttribute('src') || '';
+        if (imgSrc.startsWith('//')) imgSrc = 'https:' + imgSrc;
+        quoteImage = imgSrc;
+      }
+      
+      // 获取引用文本（排除"预览"等按钮文字）
       let quoteText = '';
-      // 方法1: 查找 reply-content 类
-      const replyContent = quoteEl.querySelector('[class*="reply-content"]');
+      // 查找 reply-content 或 reply-text 类
+      const replyContent = quoteEl.querySelector('[class*="reply-content"], [class*="reply-text"]');
       if (replyContent) {
         quoteText = replyContent.textContent?.trim() || '';
       }
-      // 方法2: 获取整个引用容器的文本，排除用户名
-      if (!quoteText) {
-        const fullText = quoteEl.textContent?.trim() || '';
-        // 去掉用户名部分
-        quoteText = quoteName ? fullText.replace(quoteName, '').trim() : fullText;
-        // 去掉开头的冒号或分隔符
-        quoteText = quoteText.replace(/^[:\s：]+/, '').trim();
+      
+      // 如果没有找到文本内容，且有图片，显示 [图片]
+      if (!quoteText && quoteImage) {
+        quoteText = '[图片]';
       }
+      
       if (quoteName || quoteText) {
         quote = `${quoteName}: ${quoteText}`;
       }
@@ -169,6 +177,7 @@ function extractMessages() {
         imageUrl,
         videoUrl,
         quote,
+        quoteImage,
         timestamp,
         avatar,
         selected: true
@@ -281,13 +290,32 @@ document.getElementById('exportMd').addEventListener('click', () => {
   }
 });
 
+// 生成引用 HTML
+function generateQuoteHtml(msg) {
+  if (!msg.quote) return '';
+  
+  let quoteContent = '';
+  if (msg.quoteImage) {
+    // 引用包含图片
+    quoteContent = `
+      <div class="quote">
+        <div class="quote-text">↩️ ${escapeHtml(msg.quote)}</div>
+        <img class="quote-img" src="${msg.quoteImage}" alt="引用图片">
+      </div>`;
+  } else {
+    // 纯文本引用
+    quoteContent = `<div class="quote">↩️ ${escapeHtml(msg.quote)}</div>`;
+  }
+  return quoteContent;
+}
+
 // 生成 HTML
 function generateHtml(msgs) {
   const messagesHtml = msgs.map(msg => `
     <div class="msg ${msg.isMe ? 'me' : 'other'}">
       <img class="avatar" src="${msg.avatar || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><circle fill=%22%23ddd%22 cx=%2220%22 cy=%2220%22 r=%2220%22/></svg>'}" alt="">
       <div class="bubble">
-        ${msg.quote ? `<div class="quote">↩️ ${escapeHtml(msg.quote)}</div>` : ''}
+        ${generateQuoteHtml(msg)}
         ${msg.imageUrl ? `<img class="chat-img" src="${msg.imageUrl}" alt="图片">` : ''}
         ${msg.videoUrl ? `<video class="chat-video" src="${msg.videoUrl}" controls></video>` : ''}
         ${!msg.imageUrl && !msg.videoUrl ? `<div class="text">${escapeHtml(msg.text)}</div>` : ''}
@@ -365,11 +393,21 @@ function generateHtml(msgs) {
     .quote {
       font-size: 12px;
       color: #999;
-      padding: 6px 8px;
+      padding: 8px 10px;
       background: rgba(0,0,0,0.05);
-      border-radius: 4px;
+      border-radius: 6px;
       margin-bottom: 8px;
       border-left: 3px solid #ddd;
+    }
+    .quote-text {
+      margin-bottom: 6px;
+    }
+    .quote-img {
+      max-width: 80px;
+      max-height: 120px;
+      border-radius: 6px;
+      display: block;
+      cursor: pointer;
     }
     .text { font-size: 14px; word-break: break-word; }
     .chat-img { 

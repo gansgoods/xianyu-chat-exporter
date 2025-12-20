@@ -128,7 +128,20 @@ function extractMessages() {
       if (quoteImgEl) {
         let imgSrc = quoteImgEl.getAttribute('src') || '';
         if (imgSrc.startsWith('//')) imgSrc = 'https:' + imgSrc;
-        quoteImage = imgSrc;
+        // 检查是否是有效图片（排除占位图）
+        if (isValidAvatar(imgSrc)) {
+          quoteImage = imgSrc;
+        } else {
+          // 尝试获取高清图（ant-image-img）
+          const hdImg = quoteEl.querySelector('.ant-image-img');
+          if (hdImg) {
+            let hdSrc = hdImg.getAttribute('src') || '';
+            if (hdSrc.startsWith('//')) hdSrc = 'https:' + hdSrc;
+            if (isValidAvatar(hdSrc)) {
+              quoteImage = hdSrc;
+            }
+          }
+        }
       }
       
       // 获取引用文本
@@ -712,21 +725,10 @@ function downloadFile(content, filename, type) {
   const blob = new Blob([content], { type: type + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
   
-  // 将中文文件名转换为安全的格式
-  const safeFilename = filename.replace(/[^\w\-_.]/g, '_');
-  console.log('准备下载文件:', filename, '-> 安全文件名:', safeFilename, '大小:', blob.size);
-  
   chrome.downloads.download({
     url: url,
-    filename: safeFilename,
+    filename: filename,
     saveAs: true
-  }, (downloadId) => {
-    if (chrome.runtime.lastError) {
-      console.error('下载失败:', chrome.runtime.lastError.message);
-      alert('下载失败: ' + chrome.runtime.lastError.message);
-    } else {
-      console.log('下载已开始，ID:', downloadId);
-    }
   });
 }
 

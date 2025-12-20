@@ -131,15 +131,24 @@ function extractMessages() {
         quoteImage = imgSrc;
       }
       
-      // 获取引用文本（排除"预览"等按钮文字）
+      // 获取引用文本
       let quoteText = '';
-      // 查找 reply-content 或 reply-text 类
-      const replyContent = quoteEl.querySelector('[class*="reply-content"], [class*="reply-text"]');
-      if (replyContent) {
-        quoteText = replyContent.textContent?.trim() || '';
+      
+      // 方法1: 查找带 opacity 样式的 span（文字引用的常见格式）
+      const opacitySpan = quoteEl.querySelector('span[style*="opacity"]');
+      if (opacitySpan) {
+        quoteText = opacitySpan.textContent?.trim() || '';
       }
       
-      // 如果没有找到文本内容，且有图片，显示 [图片]
+      // 方法2: 查找 reply-content 或 reply-text 类
+      if (!quoteText) {
+        const replyContent = quoteEl.querySelector('[class*="reply-content"], [class*="reply-text"]');
+        if (replyContent) {
+          quoteText = replyContent.textContent?.trim() || '';
+        }
+      }
+      
+      // 方法3: 如果有图片但没有文本，显示 [图片]
       if (!quoteText && quoteImage) {
         quoteText = '[图片]';
       }

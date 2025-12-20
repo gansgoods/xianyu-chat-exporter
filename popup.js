@@ -711,11 +711,14 @@ function getDateStr() {
 function downloadFile(content, filename, type) {
   const blob = new Blob([content], { type: type + ';charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  console.log('准备下载文件:', filename, '大小:', blob.size);
+  
+  // 将中文文件名转换为安全的格式
+  const safeFilename = filename.replace(/[^\w\-_.]/g, '_');
+  console.log('准备下载文件:', filename, '-> 安全文件名:', safeFilename, '大小:', blob.size);
   
   chrome.downloads.download({
     url: url,
-    filename: filename,
+    filename: safeFilename,
     saveAs: true
   }, (downloadId) => {
     if (chrome.runtime.lastError) {

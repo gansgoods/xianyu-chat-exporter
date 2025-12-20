@@ -50,10 +50,6 @@ function extractMessages() {
   // 获取所有消息元素
   const messageElements = document.querySelectorAll('[class*="ant-list-item"]');
   
-  // 记住上一个有效的头像（分别记录自己和对方的）
-  let lastMyAvatar = '';
-  let lastOtherAvatar = '';
-  
   // 判断是否是有效头像（排除占位图）
   function isValidAvatar(url) {
     if (!url) return false;
@@ -64,6 +60,27 @@ function extractMessages() {
     return true;
   }
   
+  // 第一遍：先扫描所有消息，找到有效的头像
+  let validMyAvatar = '';
+  let validOtherAvatar = '';
+  
+  messageElements.forEach((el) => {
+    const style = el.getAttribute('style') || '';
+    const isMe = style.includes('direction: rtl') || style.includes('text-align: right');
+    const avatarEl = el.querySelector('[class*="avatar"]');
+    let avatarSrc = avatarEl?.getAttribute('src') || '';
+    if (avatarSrc.startsWith('//')) avatarSrc = 'https:' + avatarSrc;
+    
+    if (isValidAvatar(avatarSrc)) {
+      if (isMe && !validMyAvatar) {
+        validMyAvatar = avatarSrc;
+      } else if (!isMe && !validOtherAvatar) {
+        validOtherAvatar = avatarSrc;
+      }
+    }
+  });
+  
+  // 第二遍：提取消息，使用有效头像填充
   messageElements.forEach((el, index) => {
     // 判断是自己还是对方的消息
     const style = el.getAttribute('style') || '';
@@ -127,19 +144,8 @@ function extractMessages() {
     let avatarSrc = avatarEl?.getAttribute('src') || '';
     if (avatarSrc.startsWith('//')) avatarSrc = 'https:' + avatarSrc;
     
-    let avatar = '';
-    if (isValidAvatar(avatarSrc)) {
-      avatar = avatarSrc;
-      // 更新记住的头像
-      if (isMe) {
-        lastMyAvatar = avatar;
-      } else {
-        lastOtherAvatar = avatar;
-      }
-    } else {
-      // 使用之前记住的头像
-      avatar = isMe ? lastMyAvatar : lastOtherAvatar;
-    }
+    // 如果当前头像无效，使用预先找到的有效头像
+    let avatar = isValidAvatar(avatarSrc) ? avatarSrc : (isMe ? validMyAvatar : validOtherAvatar);
     
     if (text || imageUrl || videoUrl) {
       messages.push({

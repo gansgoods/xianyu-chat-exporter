@@ -129,8 +129,15 @@ function extractMessages() {
     const quoteEl = el.querySelector('[class*="reply-container"]');
     let quote = '';
     let quoteImage = '';
+    let quoteIsVideo = false;
     if (quoteEl) {
       const quoteName = quoteEl.querySelector('[class*="user-nickname"]')?.textContent?.trim() || '';
+      
+      // 检查引用是否包含视频
+      const quoteVideoEl = quoteEl.querySelector('video');
+      if (quoteVideoEl) {
+        quoteIsVideo = true;
+      }
       
       // 检查引用是否包含图片
       const quoteImgEl = quoteEl.querySelector('[class*="reply-image"] img:first-child');
@@ -170,7 +177,12 @@ function extractMessages() {
         }
       }
       
-      // 方法3: 如果有图片但没有文本，显示 [图片]
+      // 方法3: 如果是视频引用但没有文本，显示 [视频]
+      if (!quoteText && quoteIsVideo) {
+        quoteText = '[视频]';
+      }
+      
+      // 方法4: 如果有图片但没有文本，显示 [图片]
       if (!quoteText && quoteImage) {
         quoteText = '[图片]';
       }

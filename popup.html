@@ -160,7 +160,7 @@
 <body>
   <div class="header">
     <span class="header-icon">💬</span>
-    闲鱼聊天记录导出
+    <span id="headerTitle">聊天记录导出</span>
   </div>
   
   <div id="loading" class="loading">
@@ -171,7 +171,7 @@
   <div id="empty" class="empty" style="display: none;">
     <div class="empty-icon">🔍</div>
     <div>未找到聊天记录</div>
-    <div style="font-size: 12px; margin-top: 8px;">请在闲鱼聊天页面使用此插件</div>
+    <div id="emptyHint" style="font-size: 12px; margin-top: 8px;">请在闲鱼或 Fiverr 聊天页面使用此插件</div>
   </div>
   
   <div id="content" style="display: none;">
@@ -179,6 +179,10 @@
       <label>
         <input type="checkbox" id="selectAll" checked>
         全选
+      </label>
+      <label style="margin-left: auto; color: #999; font-size: 12px;">
+        <input type="checkbox" id="debugMode">
+        🔧 调试
       </label>
       <span class="status" id="status">已选择 0 条</span>
     </div>

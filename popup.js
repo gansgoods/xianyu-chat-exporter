@@ -1,23 +1,30 @@
 // 存储解析后的消息
 let messages = [];
 let chatTitle = '聊天记录';
+let currentPlatform = 'unknown'; // 'xianyu' | 'fiverr' | 'unknown'
 
 // 初始化
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     // 获取当前标签页
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
-    // 检查是否在闲鱼页面
-    if (!tab.url.includes('xianyu.com') && !tab.url.includes('goofish.com')) {
+
+    // 检测平台
+    if (tab.url.includes('xianyu.com') || tab.url.includes('goofish.com')) {
+      currentPlatform = 'xianyu';
+    } else if (tab.url.includes('fiverr.com')) {
+      currentPlatform = 'fiverr';
+    } else {
       showEmpty();
       return;
     }
 
-    // 注入脚本提取消息
+    // 根据平台注入不同的提取脚本
+    const extractFunc = currentPlatform === 'fiverr' ? extractFiverrMessages : extractXianyuMessages;
+
     const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      func: extractMessages
+      func: extractFunc
     });
 
     const data = results[0]?.result;
@@ -38,8 +45,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// 在页面中执行的提取函数
-function extractMessages() {
+// ==================== 闲鱼消息提取 ====================
+function extractXianyuMessages() {
   const messages = [];
   
   // 获取聊天对象名称
@@ -254,6 +261,116 @@ function extractMessages() {
   return { messages, chatTitle };
 }
 
+// ==================== Fiverr 消息提取 ====================
+function extractFiverrMessages() {
+  const messages = [];
+
+  // 获取聊天对象名称（从页面标题或头部信息获取）
+  let chatTitle = 'Fiverr Chat';
+
+  // 尝试从消息中提取对方的用户名
+  const allMessages = document.querySelectorAll('.message');
+  for (const msg of allMessages) {
+    const nameEl = msg.querySelector('p');
+    const name = nameEl?.textContent?.trim();
+    if (name && name !== 'Me') {
+      chatTitle = name;
+      break;
+    }
+  }
+
+  // 从 URL 中提取用户名作为备选
+  const urlMatch = location.pathname.match(/\/inbox\/([^\/]+)/);
+  if (urlMatch && chatTitle === 'Fiverr Chat') {
+    chatTitle = urlMatch[1];
+  }
+
+  // 获取所有消息
+  allMessages.forEach((el, index) => {
+    // 获取完整的 textContent 来解析
+    const fullText = el.textContent || '';
+
+    // 解析用户名（第一个非空文本通常是头像字母+用户名）
+    // 格式: "HMike N.21 Dec 2025, 11:29消息内容" 或 "DMe21 Dec 2025, 13:33消息内容"
+    let sender = '';
+    let timestamp = '';
+    let text = '';
+
+    // 尝试从 figure title 获取用户名
+    const figureEl = el.querySelector('figure[title]');
+    const figureTitle = figureEl?.getAttribute('title') || '';
+
+    // 尝试从 p 元素获取显示名称
+    const nameEl = el.querySelector('p');
+    const displayName = nameEl?.textContent?.trim() || '';
+
+    // 判断是否是自己的消息
+    const isMe = displayName === 'Me';
+
+    // 提取时间戳 (格式: "21 Dec 2025, 11:29")
+    const timeMatch = fullText.match(/(\d{1,2}\s+\w+\s+\d{4},\s+\d{1,2}:\d{2})/);
+    if (timeMatch) {
+      timestamp = timeMatch[1];
+    }
+
+    // 提取消息文本
+    // 消息文本通常在时间戳之后
+    if (timeMatch) {
+      const timeIndex = fullText.indexOf(timeMatch[0]);
+      const afterTime = fullText.substring(timeIndex + timeMatch[0].length).trim();
+      text = afterTime;
+    } else {
+      // 如果没有找到时间戳，尝试获取最后的文本部分
+      const textParts = fullText.split(/\d{1,2}:\d{2}/);
+      if (textParts.length > 1) {
+        text = textParts[textParts.length - 1].trim();
+      }
+    }
+
+    // 清理文本（移除前导的用户名部分）
+    if (text.startsWith(displayName)) {
+      text = text.substring(displayName.length).trim();
+    }
+
+    // 获取头像
+    const avatarEl = el.querySelector('figure img');
+    let avatar = avatarEl?.getAttribute('src') || '';
+
+    // 检查是否有图片附件
+    let imageUrl = '';
+    const attachmentImg = el.querySelector('.message-content img:not(figure img)');
+    if (attachmentImg) {
+      imageUrl = attachmentImg.getAttribute('src') || '';
+      if (!text) text = '[图片]';
+    }
+
+    // 检查是否有文件附件
+    const fileAttachment = el.querySelector('[class*="attachment"], [class*="file"]');
+    if (fileAttachment && !text) {
+      text = '[文件]';
+    }
+
+    if (text) {
+      messages.push({
+        id: index,
+        isMe,
+        text,
+        imageUrl,
+        videoUrl: '',
+        quote: '',
+        quoteImage: '',
+        quoteIsVideo: false,
+        quoteVideoUrl: '',
+        timestamp,
+        avatar,
+        selected: true
+      });
+    }
+  });
+
+  return { messages, chatTitle };
+}
+
 // 渲染消息列表
 function renderMessages() {
   const list = document.getElementById('messageList');
@@ -262,7 +379,7 @@ function renderMessages() {
       <input type="checkbox" ${msg.selected ? 'checked' : ''} data-index="${i}">
       <div class="message-content">
         <div class="message-meta">
-          <span class="message-sender ${msg.isMe ? 'me' : ''}">${msg.isMe ? '我' : chatTitle}</span>
+          <span class="message-sender ${msg.isMe ? 'me' : ''}">${msg.isMe ? (currentPlatform === 'fiverr' ? 'Me' : '我') : chatTitle}</span>
           ${msg.timestamp ? `<span class="message-time">${msg.timestamp}</span>` : ''}
         </div>
         <div class="message-text ${msg.imageUrl ? 'image' : ''} ${msg.videoUrl ? 'video' : ''}">
@@ -630,7 +747,7 @@ function generateHtml(msgs) {
 <body>
   <div class="container">
     <div class="header">💬 聊天记录：${escapeHtml(chatTitle)}</div>
-    <div class="meta">📅 导出时间：${new Date().toLocaleString('zh-CN')} | 📱 来源：闲鱼</div>
+    <div class="meta">📅 导出时间：${new Date().toLocaleString('zh-CN')} | 📱 来源：${currentPlatform === 'fiverr' ? 'Fiverr' : '闲鱼'}</div>
     <div class="chat">
       ${messagesHtml}
     </div>
@@ -760,7 +877,7 @@ function generateMarkdown(msgs) {
       lastTime = msg.timestamp;
     }
     
-    const sender = msg.isMe ? '**我**' : `**${chatTitle}**`;
+    const sender = msg.isMe ? (currentPlatform === 'fiverr' ? '**Me**' : '**我**') : `**${chatTitle}**`;
     
     if (msg.quote) {
       md += `> ${msg.quote}\n\n`;
@@ -811,4 +928,9 @@ function showEmpty() {
 function showContent() {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('content').style.display = 'block';
+  // 根据平台更新标题
+  const titleEl = document.getElementById('headerTitle');
+  if (titleEl) {
+    titleEl.textContent = currentPlatform === 'fiverr' ? 'Fiverr Chat Export' : '闲鱼聊天记录导出';
+  }
 }

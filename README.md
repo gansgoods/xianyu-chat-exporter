@@ -1,11 +1,12 @@
-# 🐟 闲鱼聊天记录导出插件
+# 🐟 聊天记录导出插件 (闲鱼 / Fiverr)
 
-一键导出闲鱼聊天记录，支持勾选消息、导出 HTML 和 Markdown 格式。
+一键导出闲鱼、Fiverr 聊天记录，支持勾选消息、导出 HTML 和 Markdown 格式。
 
 ## ✨ 功能特点
 
+- 🌐 **多平台支持**：支持闲鱼和 Fiverr 两个平台
 - 📋 **可视化勾选**：预览所有消息，勾选需要导出的内容
-- 🎨 **精美样式**：导出的 HTML 有仿闲鱼的聊天气泡样式
+- 🎨 **精美样式**：导出的 HTML 有仿原生的聊天气泡样式
 - 📝 **多格式支持**：支持 HTML 和 Markdown 两种导出格式
 - 🖼️ **图片视频**：自动提取聊天中的图片和视频
 - 💬 **引用消息**：保留消息的引用关系
@@ -30,12 +31,20 @@
 
 ## 🚀 使用方法
 
+### 闲鱼
 1. 打开 [闲鱼网页版](https://www.goofish.com/) 并登录
 2. 进入和某人的聊天窗口
 3. **重要**：先滚动到聊天记录顶部，确保历史消息都加载出来
 4. 点击浏览器右上角的插件图标 💬
 5. 在弹出面板中勾选要导出的消息
 6. 点击「导出 HTML」或「导出 Markdown」
+
+### Fiverr
+1. 打开 [Fiverr](https://www.fiverr.com/) 并登录
+2. 进入 Inbox，打开和某人的聊天
+3. 滚动加载完整的聊天记录
+4. 点击浏览器右上角的插件图标 💬
+5. 勾选要导出的消息，点击导出
 
 ## 📄 导出效果
 
@@ -52,15 +61,30 @@
 
 ## ⚠️ 注意事项
 
-- 仅支持闲鱼网页版（goofish.com / xianyu.com）
+- 支持闲鱼网页版（goofish.com / xianyu.com）和 Fiverr（fiverr.com）
 - 需要先滚动加载完整的聊天记录
-- 图片链接来自阿里云 CDN，有时效性
+- 闲鱼图片链接来自阿里云 CDN，有时效性
 
 ## 🔧 技术说明
 
 - Manifest V3
 - 使用 Chrome Scripting API 提取页面内容
 - 纯前端实现，不上传任何数据
+
+---
+
+## ☕ Support / 支持作者
+
+If this tool saves your time, consider buying me a coffee!
+
+如果这个工具帮到了你，可以请我喝杯咖啡~
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Me-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/lonnieg)
+
+<p>
+  <img src="./donate-wechat.jpg" width="180" alt="微信打赏">
+  <img src="./donate-alipay.jpg" width="180" alt="支付宝打赏">
+</p>
 
 ---
 

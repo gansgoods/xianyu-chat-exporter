@@ -1,91 +1,90 @@
-# 🐟 聊天记录导出插件 (闲鱼 / Fiverr)
+# 🐟 Chat Export Plugin (Xianyu / Fiverr)
 
-一键导出闲鱼、Fiverr 聊天记录，支持勾选消息、导出 HTML 和 Markdown 格式。
+🌐 [English](./README.md) | [中文](./README_zh.md)
 
-## ✨ 功能特点
+Export chat history from Xianyu (闲鱼) and Fiverr with one click. Select messages and export to HTML or Markdown format.
 
-- 🌐 **多平台支持**：支持闲鱼和 Fiverr 两个平台
-- 📋 **可视化勾选**：预览所有消息，勾选需要导出的内容
-- 🎨 **精美样式**：导出的 HTML 有仿原生的聊天气泡样式
-- 📝 **多格式支持**：支持 HTML 和 Markdown 两种导出格式
-- 🖼️ **图片视频**：自动提取聊天中的图片和视频
-- 💬 **引用消息**：保留消息的引用关系
+## ✨ Features
 
-## 📦 安装方法
+- 🌐 **Multi-platform**: Support Xianyu and Fiverr
+- 📋 **Visual Selection**: Preview and select messages to export
+- 🎨 **Beautiful Style**: Exported HTML preserves chat bubble style
+- 📝 **Multiple Formats**: Export to HTML or Markdown
+- 🖼️ **Media Support**: Auto-extract images and videos
+- 💬 **Quote Support**: Preserve message reply relationships
 
-### 方式一：开发者模式加载（推荐）
+## 📦 Installation
 
-1. 打开 Chrome 浏览器
-2. 访问 `chrome://extensions/`
-3. 右上角打开「**开发者模式**」
-4. 点击「**加载已解压的扩展程序**」
-5. 选择 `xianyu-chat-exporter` 这个文件夹
-6. 安装完成！
+### Option 1: Developer Mode (Recommended)
 
-### 方式二：打包成 crx 文件
+1. Open Chrome browser
+2. Go to `chrome://extensions/`
+3. Enable **Developer mode** (top right)
+4. Click **Load unpacked**
+5. Select the `xianyu-chat-exporter` folder
+6. Done!
 
-1. 在 `chrome://extensions/` 页面
-2. 点击「打包扩展程序」
-3. 选择此文件夹路径
-4. 生成 `.crx` 文件后双击安装
+### Option 2: Pack as CRX
 
-## 🚀 使用方法
+1. Go to `chrome://extensions/`
+2. Click "Pack extension"
+3. Select this folder
+4. Install the generated `.crx` file
 
-### 闲鱼
-1. 打开 [闲鱼网页版](https://www.goofish.com/) 并登录
-2. 进入和某人的聊天窗口
-3. **重要**：先滚动到聊天记录顶部，确保历史消息都加载出来
-4. 点击浏览器右上角的插件图标 💬
-5. 在弹出面板中勾选要导出的消息
-6. 点击「导出 HTML」或「导出 Markdown」
+## 🚀 Usage
+
+### Xianyu (闲鱼)
+1. Open [Xianyu Web](https://www.goofish.com/) and login
+2. Open a chat conversation
+3. **Important**: Scroll to top to load all messages
+4. Click the extension icon 💬
+5. Select messages and click Export
 
 ### Fiverr
-1. 打开 [Fiverr](https://www.fiverr.com/) 并登录
-2. 进入 Inbox，打开和某人的聊天
-3. 滚动加载完整的聊天记录
-4. 点击浏览器右上角的插件图标 💬
-5. 勾选要导出的消息，点击导出
+1. Open [Fiverr](https://www.fiverr.com/) and login
+2. Go to Inbox, open a conversation
+3. Scroll to load all messages
+4. Click the extension icon 💬
+5. Select messages and click Export
 
-## 📄 导出效果
+## 📄 Export Formats
 
-### HTML 格式
-- 保留头像、气泡样式
-- 图片可直接查看
-- 视频可播放
-- 一个独立 HTML 文件，可直接打开
+### HTML
+- Preserves avatars and chat bubble style
+- Images viewable directly
+- Videos playable
+- Single standalone HTML file
 
-### Markdown 格式
-- 纯文本，方便复制
-- 图片以链接形式保留
-- 适合整理到笔记软件
+### Markdown
+- Plain text, easy to copy
+- Images as links
+- Great for note-taking apps
 
-## ⚠️ 注意事项
+## ⚠️ Notes
 
-- 支持闲鱼网页版（goofish.com / xianyu.com）和 Fiverr（fiverr.com）
-- 需要先滚动加载完整的聊天记录
-- 闲鱼图片链接来自阿里云 CDN，有时效性
+- Supports Xianyu (goofish.com / xianyu.com) and Fiverr (fiverr.com)
+- Scroll to load complete chat history first
+- Xianyu image links are from Alibaba CDN, may expire
 
-## 🔧 技术说明
+## 🔧 Technical
 
 - Manifest V3
-- 使用 Chrome Scripting API 提取页面内容
-- 纯前端实现，不上传任何数据
+- Chrome Scripting API for content extraction
+- Pure frontend, no data uploaded
 
 ---
 
-## ☕ Support / 支持作者
+## ☕ Support
 
 If this tool saves your time, consider buying me a coffee!
-
-如果这个工具帮到了你，可以请我喝杯咖啡~
 
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Me-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/lonnieg)
 
 <p>
-  <img src="./donate-wechat.jpg" width="180" alt="微信打赏">
-  <img src="./donate-alipay.jpg" width="180" alt="支付宝打赏">
+  <img src="./donate-wechat.jpg" width="180" alt="WeChat">
+  <img src="./donate-alipay.jpg" width="180" alt="Alipay">
 </p>
 
 ---
 
-Made with ❤️ for 效率工作
+Made with ❤️ for productivity

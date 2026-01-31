@@ -74,16 +74,16 @@ Export chat history from Xianyu (闲鱼) and Fiverr with one click. Select messa
 
 ---
 
-## ☕ Support
+## ☕ Support / 支持作者
 
 If this tool saves your time, consider buying me a coffee!
 
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Me-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/lonnieg)
+如果这个工具帮到了你，可以请我喝杯咖啡~
 
-<p>
-  <img src="./donate-wechat.jpg" width="180" alt="WeChat">
-  <img src="./donate-alipay.jpg" width="180" alt="Alipay">
-</p>
+| 🌐 International | 🇨🇳 国内用户 |
+|:---:|:---:|
+| [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/lonnieg) | 微信 / 支付宝 |
+| | <img src="./donate-wechat.jpg" width="150" alt="WeChat"> <img src="./donate-alipay.jpg" width="150" alt="Alipay"> |
 
 ---
 

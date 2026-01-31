@@ -75,16 +75,16 @@
 
 ---
 
-## ☕ 支持作者
+## ☕ Support / 支持作者
+
+If this tool saves your time, consider buying me a coffee!
 
 如果这个工具帮到了你，可以请我喝杯咖啡~
 
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Me-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/lonnieg)
-
-<p>
-  <img src="./donate-wechat.jpg" width="180" alt="微信打赏">
-  <img src="./donate-alipay.jpg" width="180" alt="支付宝打赏">
-</p>
+| 🌐 International | 🇨🇳 国内用户 |
+|:---:|:---:|
+| [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/lonnieg) | 微信 / 支付宝 |
+| | <img src="./donate-wechat.jpg" width="150" alt="微信打赏"> <img src="./donate-alipay.jpg" width="150" alt="支付宝打赏"> |
 
 ---
 
